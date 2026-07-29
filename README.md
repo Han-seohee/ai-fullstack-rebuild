@@ -21,10 +21,9 @@ AI 시대에 풀스택 개발자로 다시 성장하는 과정을 Public으로 �
 
 ## 🚀 Current Sprint
 
-- Development Workflow
-- Cursor
-- GitHub
-- Preparing First Project
+- AI Dev Assistant MVP
+- Next.js Route Handler
+- OpenAI 연동 준비
 
 ---
 
@@ -60,7 +59,7 @@ AI 시대에 풀스택 개발자로 다시 성장하는 과정을 Public으로 �
 
 README에는 세 가지만: **무엇을** · **왜 이 구조인지** · **배운 점**
 
-아직 없음. `01-`부터 시작.
+- **01 · [AI Commit Writer](projects/01-ai-commit-writer/)** — 작업 내용 입력 → 커밋 메시지·개발일지 생성
 
 ---
 
