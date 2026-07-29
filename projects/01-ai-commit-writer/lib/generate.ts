@@ -21,9 +21,9 @@ export function getMockResult(input: string): GenerateResult {
       decision:
         "첫날 OpenAI 연동 대신 단일 페이지 클라이언트 컴포넌트와 mock 데이터로 구성. shadcn/ui + Tailwind로 API 연동 전 UI 일관성 유지.",
       outcome:
-        "두 번째 화면이나 공유 로직이 생기기 전까지 페이지는 단일 파일로 유지. mock 레이어는 lib/mock.ts에 두어 실제 API 라우트로 교체 시 한 파일만 변경하면 됨.",
+        "두 번째 화면이나 공유 로직이 생기기 전까지 페이지는 단일 파일로 유지. mock 레이어는 lib/generate.ts에 두어 실제 API 라우트로 교체 시 한 파일만 변경하면 됨.",
       next:
-        "/api/generate 라우트 추가, OpenAI 연결, getMockResult를 API 호출로 교체.",
+        "OpenAI 연결, getMockResult를 실제 AI 호출로 교체.",
     },
   };
 }
