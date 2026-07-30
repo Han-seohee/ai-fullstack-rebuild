@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
+import OpenAI from "openai";
 
-import { getMockResult } from "@/lib/generate";
+import type { GenerateResult } from "@/lib/generate";
 
 type GenerateRequestBody = {
   input?: string;
@@ -10,21 +11,78 @@ type GenerateRequestBody = {
  * POST /api/generate
  *
  * App Router의 Route Handler로 서버 엔드포인트를 둡니다.
- * OpenAI 호출은 서버에서만 수행할 예정이므로, API 키를 클라이언트에 노출하지 않고
+ * OpenAI 호출은 서버에서만 수행하므로, API 키를 클라이언트에 노출하지 않고
  * 프론트는 이 경로로만 통신합니다.
  */
 export async function POST(request: Request) {
-  const body = (await request.json()) as GenerateRequestBody;
-  const input = (body.input ?? "").trim();
-
-  // 클라이언트 검증을 우회한 빈 요청을 서버에서도 거절합니다.
-  if (!input) {
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) {
     return NextResponse.json(
-      { error: "입력 내용을 작성해주세요." },
-      { status: 400 },
+      { error: "OpenAI API 키가 설정되지 않았습니다." },
+      { status: 500 },
     );
   }
 
-  // OpenAI 연동 전: Mock 생성 로직은 lib/generate.ts 한곳에서만 관리합니다.
-  return NextResponse.json(getMockResult(input));
+  try {
+    const body = (await request.json()) as GenerateRequestBody;
+    const input = (body.input ?? "").trim();
+
+    // 클라이언트 검증을 우회한 빈 요청을 서버에서도 거절합니다.
+    if (!input) {
+      return NextResponse.json(
+        { error: "입력 내용을 작성해주세요." },
+        { status: 400 },
+      );
+    }
+
+    const openai = new OpenAI({ apiKey });
+
+    const response = await openai.responses.create({
+      model: "gpt-4o-mini",
+      instructions: `당신은 개발자의 작업 내용을 바탕으로 git 커밋 메시지와 개발일지를 작성하는 어시스턴트입니다.
+
+반드시 아래 JSON 구조로만 응답하세요:
+{
+  "commitMessage": "Conventional Commits 형식의 커밋 메시지 (한국어 또는 영어)",
+  "journal": {
+    "context": "작업 배경과 상황",
+    "decision": "내린 결정과 그 이유",
+    "outcome": "결과와 배운 점",
+    "next": "다음에 할 일"
+  }
+}
+
+journal의 각 필드는 한국어로 작성하세요.`,
+      input: `오늘 작업한 내용:\n\n${input}`,
+      text: {
+        format: { type: "json_object" },
+      },
+    });
+
+    const content = response.output_text;
+    if (!content) {
+      throw new Error("OpenAI 응답이 비어 있습니다.");
+    }
+
+    const result = JSON.parse(content) as GenerateResult;
+
+    if (
+      typeof result.commitMessage !== "string" ||
+      !result.journal ||
+      typeof result.journal.context !== "string" ||
+      typeof result.journal.decision !== "string" ||
+      typeof result.journal.outcome !== "string" ||
+      typeof result.journal.next !== "string"
+    ) {
+      throw new Error("OpenAI 응답 형식이 올바르지 않습니다.");
+    }
+
+    return NextResponse.json(result);
+  } catch (error) {
+    console.error("[POST /api/generate]", error);
+    return NextResponse.json(
+      { error: "생성 요청에 실패했습니다." },
+      { status: 500 },
+    );
+  }
 }
