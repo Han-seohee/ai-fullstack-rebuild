@@ -25,7 +25,9 @@ AI 시대에 풀스택 개발자로 다시 성장하는 과정을 Public으로 �
 - [x] Repository Setup
 - [x] AI Dev Assistant MVP
 - [x] OpenAI Integration
+- [x] Prompt Architecture
 - [ ] Prompt Engineering
+- [ ] UX Improvement
 - [ ] Project 01 Release
 - [ ] Project 02
 - [ ] Project 03
@@ -35,8 +37,8 @@ AI 시대에 풀스택 개발자로 다시 성장하는 과정을 Public으로 �
 ## 🚀 Current Sprint
 
 - Prompt Engineering
-- AI Commit Writer v1
-- OpenAI Response Quality
+- AI Response Quality
+- Input UX Design
 
 ---
 
