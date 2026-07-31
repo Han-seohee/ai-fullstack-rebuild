@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import OpenAI from "openai";
 
 import type { GenerateResult } from "@/lib/generate";
+import { SYSTEM_PROMPT, buildUserInput } from "@/lib/prompt";
 
 type GenerateRequestBody = {
   input?: string;
@@ -39,21 +40,8 @@ export async function POST(request: Request) {
 
     const response = await openai.responses.create({
       model: "gpt-4o-mini",
-      instructions: `당신은 개발자의 작업 내용을 바탕으로 git 커밋 메시지와 개발일지를 작성하는 어시스턴트입니다.
-
-반드시 아래 JSON 구조로만 응답하세요:
-{
-  "commitMessage": "Conventional Commits 형식의 커밋 메시지 (한국어 또는 영어)",
-  "journal": {
-    "context": "작업 배경과 상황",
-    "decision": "내린 결정과 그 이유",
-    "outcome": "결과와 배운 점",
-    "next": "다음에 할 일"
-  }
-}
-
-journal의 각 필드는 한국어로 작성하세요.`,
-      input: `오늘 작업한 내용:\n\n${input}`,
+      instructions: SYSTEM_PROMPT,
+      input: buildUserInput(input),
       text: {
         format: { type: "json_object" },
       },
