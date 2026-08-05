@@ -1,5 +1,5 @@
 import {
-  buildCommitLanguageRule,
+  COMMIT_BILINGUAL_RULE,
   COMMIT_FEW_SHOT,
   COMMIT_PROMPT,
 } from "@/lib/prompts/commit";
@@ -17,26 +17,16 @@ import {
   OUTPUT_FORMAT,
   joinPromptSections,
 } from "@/lib/prompts/shared";
-import type { CommitLanguage } from "@/lib/generate";
-import { DEFAULT_COMMIT_LANGUAGE } from "@/lib/generate";
-
-export type GeneratePromptOptions = {
-  commitLanguage?: CommitLanguage;
-};
 
 /** generate API용 system prompt — shared + commit + journal + detail 조합 */
-export function buildGenerateSystemPrompt(
-  options: GeneratePromptOptions = {},
-): string {
-  const commitLanguage = options.commitLanguage ?? DEFAULT_COMMIT_LANGUAGE;
-
+export function buildGenerateSystemPrompt(): string {
   return joinPromptSections(
     GENERATE_ROLE,
     FACT_RESTRICTION_RULES,
     JOURNAL_FORBIDDEN_PHRASES,
     CORE_PRINCIPLES,
     COMMIT_PROMPT,
-    buildCommitLanguageRule(commitLanguage),
+    COMMIT_BILINGUAL_RULE,
     JOURNAL_PROMPT,
     DETAIL_PROMPT,
     OUTPUT_FORMAT,

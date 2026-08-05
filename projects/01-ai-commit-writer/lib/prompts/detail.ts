@@ -34,7 +34,10 @@ Response input messages must contain the word 'json'
 **출력:**
 \`\`\`json
 {
-  "commitMessage": "fix: detail API JSON 모드 400 에러",
+  "commit": {
+    "ko": "fix: detail API JSON 모드 400 에러",
+    "en": "fix: resolve detail API JSON mode 400 error"
+  },
   "journal": {
     "context": "detail API 호출 시 400 에러가 발생해, JSON 모드 관련 설정을 점검하는 작업을 시작했다.",
     "decision": "에러 메시지를 단서로 input 메시지 쪽을 먼저 확인하기로 했다.",
@@ -65,7 +68,10 @@ detail API가 입력에 없는 A/B 테스트 내용을 생성함
 **출력:**
 \`\`\`json
 {
-  "commitMessage": "fix: detail API 응답 품질 개선",
+  "commit": {
+    "ko": "fix: detail API 응답 품질 개선",
+    "en": "fix: improve detail API response quality"
+  },
   "journal": {
     "context": "detail API 결과가 입력과 맞지 않는 경우가 있어, 응답 품질을 점검하는 작업을 시작했다.",
     "decision": "입력에 없는 내용이 생성되는 현상부터 재현하고 원인을 좁히기로 했다.",
@@ -97,12 +103,15 @@ Responses API json_object 모드는 input에 json 키워드 필요
 **출력:**
 \`\`\`json
 {
-  "commitMessage": "fix: detail API JSON 모드 input 키워드 누락 수정",
+  "commit": {
+    "ko": "fix: detail API JSON 모드 input 키워드 누락 수정",
+    "en": "fix: add missing json keyword in detail API input"
+  },
   "journal": {
     "context": "detail API 400 에러가 반복돼 json_object 모드 조건을 점검했다.",
     "decision": "generate API와 동일하게 buildDetailUserInput에 JSON 출력 안내 문구를 추가하기로 했다.",
     "outcome": "buildDetailUserInput에 JSON 출력 안내 문구를 추가해 detail API 400 에러를 해결했다.",
-    "next": "이번 수정으로 detail API JSON 모드 호출 문제를 마무리했다."
+    "next": "기록되지 않음"
   },
   "troubleshooting": {
     "problem": "POST /api/generate/detail 400 — json 키워드 누락",

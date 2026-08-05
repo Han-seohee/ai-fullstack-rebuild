@@ -6,6 +6,11 @@ import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import {
   Card,
   CardAction,
   CardContent,
@@ -26,6 +31,7 @@ import {
   COMMIT_LANGUAGES,
   COMMIT_LANGUAGE_LABELS,
   DEFAULT_COMMIT_LANGUAGE,
+  getCommitMessage,
 } from "@/lib/generate";
 import { buildCombinedInput } from "@/lib/input";
 import {
@@ -325,7 +331,7 @@ export default function Home() {
       const response = await fetch("/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ input: combinedInput, commitLanguage }),
+        body: JSON.stringify({ input: combinedInput }),
       });
 
       if (!response.ok) {
@@ -377,7 +383,7 @@ export default function Home() {
   async function handleCopyCommit() {
     if (!result) return;
 
-    await navigator.clipboard.writeText(result.commitMessage);
+    await navigator.clipboard.writeText(getCommitMessage(result, commitLanguage));
     showCopyFeedback(setCommitCopied, commitCopyTimer);
     toast.success("커밋 메시지가 복사되었습니다.");
   }
@@ -710,26 +716,34 @@ export default function Home() {
                     이전
                   </Button>
                 )}
-                <Button
-                  size="lg"
-                  onClick={handlePrimaryAction}
-                  disabled={primaryDisabled}
-                  className={cn(
-                    "h-10 gap-2 px-4 sm:px-5 transition-opacity duration-200",
-                    isLastStep && "px-6",
-                  )}
-                >
-                  <span>{primaryLabel}</span>
-                  {isLastStep && !isLoading && !isAnalyzing && (
-                    <kbd className="pointer-events-none inline-flex items-center gap-0.5 rounded-md border border-primary-foreground/25 bg-primary-foreground/10 px-1.5 py-0.5 font-mono text-[10px] font-normal leading-none text-primary-foreground/90">
-                      <span>⌘</span>
-                      <span className="text-primary-foreground/45">/</span>
-                      <span>Ctrl</span>
-                      <span className="text-primary-foreground/60">+</span>
-                      <span>Enter</span>
-                    </kbd>
-                  )}
-                </Button>
+                {isLastStep && !isLoading && !isAnalyzing ? (
+                  <Tooltip>
+                    <TooltipTrigger
+                      render={
+                        <Button
+                          size="lg"
+                          onClick={handlePrimaryAction}
+                          disabled={primaryDisabled}
+                          className="h-10 px-6 transition-opacity duration-200"
+                        />
+                      }
+                    >
+                      {primaryLabel}
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      ⌘ Enter로도 실행할 수 있습니다.
+                    </TooltipContent>
+                  </Tooltip>
+                ) : (
+                  <Button
+                    size="lg"
+                    onClick={handlePrimaryAction}
+                    disabled={primaryDisabled}
+                    className="h-10 gap-2 px-4 sm:px-5 transition-opacity duration-200"
+                  >
+                    {primaryLabel}
+                  </Button>
+                )}
               </div>
             </div>
             {error && <p className="text-sm text-destructive">{error}</p>}
@@ -751,33 +765,33 @@ export default function Home() {
         </CardHeader>
         <CardContent className="space-y-8 pt-6">
           <section className="space-y-3">
-            <div
-              className="inline-flex rounded-lg border border-border/60 bg-muted/30 p-1"
-              role="group"
-              aria-label="커밋 메시지 언어"
-            >
-              {COMMIT_LANGUAGES.map((lang) => {
-                const isSelected = commitLanguage === lang;
-                return (
-                  <button
-                    key={lang}
-                    type="button"
-                    disabled={isLoading}
-                    onClick={() => setCommitLanguage(lang)}
-                    aria-pressed={isSelected}
-                    className={cn(
-                      "rounded-md px-3 py-1.5 text-xs font-medium transition-colors duration-200",
-                      isSelected
-                        ? "bg-background text-foreground shadow-sm"
-                        : "text-muted-foreground hover:text-foreground",
-                      isLoading && "cursor-not-allowed opacity-60",
-                    )}
-                  >
-                    {COMMIT_LANGUAGE_LABELS[lang]}
-                  </button>
-                );
-              })}
-            </div>
+            {result && (
+              <div
+                className="inline-flex rounded-lg border border-border/60 bg-muted/30 p-1"
+                role="group"
+                aria-label="커밋 메시지 언어"
+              >
+                {COMMIT_LANGUAGES.map((lang) => {
+                  const isSelected = commitLanguage === lang;
+                  return (
+                    <button
+                      key={lang}
+                      type="button"
+                      onClick={() => setCommitLanguage(lang)}
+                      aria-pressed={isSelected}
+                      className={cn(
+                        "rounded-md px-3 py-1.5 text-xs font-medium transition-colors duration-200",
+                        isSelected
+                          ? "bg-background text-foreground shadow-sm"
+                          : "text-muted-foreground hover:text-foreground",
+                      )}
+                    >
+                      {COMMIT_LANGUAGE_LABELS[lang]}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
             <div className="flex items-start justify-between gap-4">
               <div className="space-y-1">
                 <h3 className="text-sm font-medium text-foreground">
@@ -806,7 +820,7 @@ export default function Home() {
               </div>
             ) : result ? (
               <pre className="overflow-x-auto rounded-lg border border-border/60 bg-muted/30 px-4 py-3 font-mono text-sm leading-relaxed text-foreground transition-colors duration-200">
-                {result.commitMessage}
+                {getCommitMessage(result, commitLanguage)}
               </pre>
             ) : (
               <div className="flex min-h-16 items-center rounded-lg border border-dashed border-border/60 bg-muted/20 px-4">

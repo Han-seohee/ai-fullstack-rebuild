@@ -12,13 +12,18 @@ export type TroubleshootingEntry = {
   learned: string;
 };
 
+export type CommitMessages = {
+  ko: string;
+  en: string;
+};
+
 export type GenerateResult = {
-  commitMessage: string;
+  commit: CommitMessages;
   journal: JournalEntry;
   troubleshooting: TroubleshootingEntry | null;
 };
 
-/** 커밋 메시지 출력 언어 (추후 CommitStyle 등과 조합 가능) */
+/** 커밋 메시지 UI 표시 언어 (토글용, API 재호출 없음) */
 export const COMMIT_LANGUAGES = ["ko", "en"] as const;
 export type CommitLanguage = (typeof COMMIT_LANGUAGES)[number];
 export const DEFAULT_COMMIT_LANGUAGE: CommitLanguage = "en";
@@ -33,6 +38,13 @@ export function isCommitLanguage(value: unknown): value is CommitLanguage {
     typeof value === "string" &&
     (COMMIT_LANGUAGES as readonly string[]).includes(value)
   );
+}
+
+export function getCommitMessage(
+  result: GenerateResult,
+  lang: CommitLanguage = DEFAULT_COMMIT_LANGUAGE,
+): string {
+  return result.commit[lang];
 }
 
 /** AI follow-up 질문 카테고리 */
@@ -60,6 +72,15 @@ export function isValidJournalEntry(value: unknown): value is JournalEntry {
   );
 }
 
+export function isValidCommitMessages(value: unknown): value is CommitMessages {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    typeof (value as CommitMessages).ko === "string" &&
+    typeof (value as CommitMessages).en === "string"
+  );
+}
+
 type LegacyStyledJournals = {
   default?: JournalEntry;
   interview?: JournalEntry;
@@ -71,7 +92,6 @@ export function normalizeGenerateResult(value: unknown): GenerateResult | null {
   if (typeof value !== "object" || value === null) return null;
 
   const raw = value as Record<string, unknown>;
-  if (typeof raw.commitMessage !== "string") return null;
 
   const troubleshooting = raw.troubleshooting;
   const isValidTroubleshooting =
@@ -82,20 +102,31 @@ export function normalizeGenerateResult(value: unknown): GenerateResult | null {
 
   if (!isValidTroubleshooting) return null;
 
-  if (isValidJournalEntry(raw.journal)) {
+  const journal = isValidJournalEntry(raw.journal)
+    ? raw.journal
+    : (() => {
+        const journals = raw.journals as LegacyStyledJournals | undefined;
+        return journals && isValidJournalEntry(journals.default)
+          ? journals.default
+          : null;
+      })();
+
+  if (!journal) return null;
+
+  if (isValidCommitMessages(raw.commit)) {
     return {
-      commitMessage: raw.commitMessage,
-      journal: raw.journal,
+      commit: raw.commit,
+      journal,
       troubleshooting: troubleshooting as TroubleshootingEntry | null,
     };
   }
 
-  // v3 history 호환: journals.default → journal
-  const journals = raw.journals as LegacyStyledJournals | undefined;
-  if (journals && isValidJournalEntry(journals.default)) {
+  // v6 이전: commitMessage 단일 문자열
+  if (typeof raw.commitMessage === "string") {
+    const message = raw.commitMessage;
     return {
-      commitMessage: raw.commitMessage,
-      journal: journals.default,
+      commit: { ko: message, en: message },
+      journal,
       troubleshooting: troubleshooting as TroubleshootingEntry | null,
     };
   }

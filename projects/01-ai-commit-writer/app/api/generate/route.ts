@@ -2,10 +2,8 @@ import { NextResponse } from "next/server";
 import OpenAI from "openai";
 
 import {
-  DEFAULT_COMMIT_LANGUAGE,
-  type CommitLanguage,
   type GenerateResult,
-  isCommitLanguage,
+  isValidCommitMessages,
   isValidJournalEntry,
 } from "@/lib/generate";
 import { createJsonObjectCompletion } from "@/lib/openai-json";
@@ -14,7 +12,6 @@ import { buildUserInput } from "@/lib/prompt";
 
 type GenerateRequestBody = {
   input?: string;
-  commitLanguage?: CommitLanguage;
 };
 
 /**
@@ -36,9 +33,6 @@ export async function POST(request: Request) {
   try {
     const body = (await request.json()) as GenerateRequestBody;
     const input = (body.input ?? "").trim();
-    const commitLanguage = isCommitLanguage(body.commitLanguage)
-      ? body.commitLanguage
-      : DEFAULT_COMMIT_LANGUAGE;
 
     if (!input) {
       return NextResponse.json(
@@ -51,8 +45,8 @@ export async function POST(request: Request) {
 
     const content = await createJsonObjectCompletion(
       openai,
-      buildGenerateSystemPrompt({ commitLanguage }),
-      buildUserInput(input, commitLanguage),
+      buildGenerateSystemPrompt(),
+      buildUserInput(input),
     );
 
     const result = JSON.parse(content) as GenerateResult;
@@ -67,7 +61,7 @@ export async function POST(request: Request) {
         typeof troubleshooting.learned === "string");
 
     if (
-      typeof result.commitMessage !== "string" ||
+      !isValidCommitMessages(result.commit) ||
       !isValidJournalEntry(result.journal) ||
       !isValidTroubleshooting
     ) {

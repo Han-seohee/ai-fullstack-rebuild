@@ -3,8 +3,11 @@ import type {
   FollowUpQuestion,
   GenerateResult,
 } from "@/lib/generate";
-import { DEFAULT_COMMIT_LANGUAGE } from "@/lib/generate";
-import { normalizeGenerateResult } from "@/lib/generate";
+import {
+  DEFAULT_COMMIT_LANGUAGE,
+  getCommitMessage,
+  normalizeGenerateResult,
+} from "@/lib/generate";
 
 const DRAFT_KEY = "ai-dev-assistant-draft";
 const HISTORY_KEY = "ai-dev-assistant-history";
@@ -122,11 +125,17 @@ export function loadHistory(): HistoryEntry[] {
       const result = normalizeGenerateResult(e.result);
       if (
         typeof e.id === "string" &&
-        typeof e.commitMessage === "string" &&
         typeof e.createdAt === "string" &&
         result
       ) {
-        entries.push({ ...e, result });
+        entries.push({
+          ...e,
+          result,
+          commitMessage:
+            typeof e.commitMessage === "string"
+              ? e.commitMessage
+              : getCommitMessage(result, DEFAULT_COMMIT_LANGUAGE),
+        });
       }
     }
     return entries;
@@ -144,7 +153,7 @@ export function addHistoryEntry(
 
   const entry: HistoryEntry = {
     id: crypto.randomUUID(),
-    commitMessage: result.commitMessage,
+    commitMessage: getCommitMessage(result, DEFAULT_COMMIT_LANGUAGE),
     result,
     combinedInput,
     createdAt: new Date().toISOString(),

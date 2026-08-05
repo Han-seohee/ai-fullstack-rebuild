@@ -43,7 +43,7 @@ AI Dev Assistant는
 
 ## 📸 Screenshot
 
-![AI Dev Assistant](./public/screenshot.png)
+![AI Dev Assistant](./docs/screenshot.png)
 
 ---
 

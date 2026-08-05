@@ -1,9 +1,9 @@
 /**
- * Prompt Version: v6
- * Last Updated: 2026-08-04
+ * Prompt Version: v7
+ * Last Updated: 2026-08-05
  */
 
-export const PROMPT_VERSION = "v6";
+export const PROMPT_VERSION = "v7";
 
 /** Responses API json_object 모드: input 메시지에 'json' 키워드가 포함되어야 합니다. */
 export const JSON_RESPONSE_INSTRUCTION =
@@ -50,7 +50,10 @@ export const CORE_PRINCIPLES = `## 핵심 원칙
 export const OUTPUT_FORMAT = `## 출력 형식
 
 {
-  "commitMessage": "Conventional Commits 형식",
+  "commit": {
+    "ko": "Conventional Commits 형식 (한국어 description)",
+    "en": "Conventional Commits format (English description only)"
+  },
   "journal": {
     "context": "...",
     "decision": "...",

@@ -38,12 +38,21 @@ Prompt 변경 이력을 기록합니다. Prompt를 수정할 때마다 새 버�
 
 ---
 
-## v6 (current)
+## v6
 
 - 창작 금지 vs 정리 허용 기준 명확화 (복붙 방지 + 자연스러운 재구성 허용)
 - context / decision / outcome 필드별 역할·작성 가이드 강화
 - decision: 입력에 명시된 선택·이유만 / outcome: 완료 작업만 (효과·성과 금지)
 - Few-shot 예시 전면 개편 (Prompt 분리 정리 예시 추가, journal 필드 관점 분리)
+
+---
+
+## v7 (current)
+
+- 커밋 메시지 이중 언어 생성 (`commit.ko` + `commit.en`)
+- Commit Prompt: 핵심 변경을 구체적으로 드러내는 description 규칙 강화
+- Journal Prompt: context 흐름 연결, next `"기록되지 않음"` 규칙
+- Prompt 문서화: `docs/prompt/`
 
 ---
 

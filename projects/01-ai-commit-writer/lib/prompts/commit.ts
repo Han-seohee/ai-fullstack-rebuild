@@ -2,8 +2,6 @@
  * Commit message prompt — Conventional Commits 규칙 및 few-shot (예시 1–2)
  */
 
-import type { CommitLanguage } from "@/lib/generate";
-
 export const COMMIT_PROMPT = `## 커밋 메시지 규칙
 
 Conventional Commits 형식: \`type: description\` 또는 \`type(scope): description\`
@@ -21,39 +19,33 @@ Conventional Commits 형식: \`type: description\` 또는 \`type(scope): descrip
 4. **리팩토링** (동작 변경 없는 정리) → \`refactor:\`
 5. **문서** → \`docs:\`
 
+### description은 핵심 변경을 구체적으로
+
+추상적·포괄적인 한 단어 요약은 피하고, **입력에서 확인 가능한 핵심 작업**이 드러나게 씁니다.
+
 **나쁜 예** (너무 포괄적):
-- \`feat: UI 개선\` (Skeleton, Toast, localStorage 등 여러 작업을 한 단어로 뭉갬)
+- \`refactor: prompt 코드 분리\`
+- \`feat: UI 개선\`
 - \`refactor: 코드 개선\`
 
-**좋은 예** (영향도 큰 변경 하나를 구체적으로):
-- 입력: Skeleton UI, Toast, localStorage 자동 저장, History → \`feat: localStorage 자동 저장 및 생성 기록\`
-- 입력: OpenAI API 연동, Prompt 분리, Route Handler → \`feat: OpenAI API 연동 및 Prompt 모듈 분리\`
-- 입력: Prompt를 shared, commit, journal 파일로 분리 → \`refactor: Prompt 역할별 모듈 분리\`
+**좋은 예** (핵심 변경이 드러남):
+- 입력: Prompt를 shared, commit, journal 파일로 분리 → \`refactor: split prompt modules by responsibility\`
+- 입력: Prompt 역할별 모듈 분리 → \`refactor: modularize prompt generation logic\`
+- 입력: Skeleton UI, Toast, localStorage 자동 저장 → \`feat: add localStorage auto-save and generation history\`
+- 입력: OpenAI API 연동, Prompt 분리, Route Handler → \`feat: integrate OpenAI API and split prompt modules\`
 
-- **description**: 선택한 변경을 **구체적으로** 한 줄로 요약합니다.`;
+- **description**: 선택한 변경의 **구체적 행위·대상**을 한 줄로 요약합니다.
+- 입력에 없는 구현·기능·파일명을 추가하지 마세요.`;
 
-/** 선택된 commitMessage 언어에 대한 강제 규칙 (few-shot 한국어 예시보다 우선) */
-export function buildCommitLanguageRule(
-  commitLanguage: CommitLanguage,
-): string {
-  if (commitLanguage === "en") {
-    return `## commitMessage 언어 — English (필수)
+export const COMMIT_BILINGUAL_RULE = `## commit — 한국어·영어 동시 생성 (필수)
 
-- commitMessage description은 **반드시 영어**로 작성합니다.
-- 입력이 한국어여도 commitMessage는 영어로 작성합니다. 한글을 commitMessage에 사용하지 마세요.
-- 아래 few-shot 예시의 commitMessage가 한국어여도 **따르지 마세요**. 이번 요청은 English입니다.
-- journal과 troubleshooting은 **항상 한국어**입니다.
+commit 객체에 **ko**와 **en** 두 버전을 **항상 함께** 작성합니다.
 
-영어 commitMessage 예시:
-- \`refactor: modularize prompt architecture\`
-- \`feat: add OpenAI API integration and split prompt modules\``;
-  }
-
-  return `## commitMessage 언어 — 한국어 (필수)
-
-- commitMessage description은 **반드시 한국어**로 작성합니다.
+- **ko**: Conventional Commits 형식, description은 **한국어**
+- **en**: Conventional Commits format, description은 **영어만** (한글 금지)
+- 두 버전은 **같은 type·scope·의미**를 전달합니다. ko와 en은 번역 관계입니다.
+- 입력이 한국어여도 en description은 영어로 작성합니다.
 - journal과 troubleshooting은 **항상 한국어**입니다.`;
-}
 
 export const COMMIT_FEW_SHOT = `### 예시 1 — Prompt 분리 (짧은 입력, 정리)
 
@@ -66,12 +58,15 @@ Prompt를 shared, commit, journal 파일로 분리했다.
 **출력:**
 \`\`\`json
 {
-  "commitMessage": "refactor: Prompt 역할별 모듈 분리",
+  "commit": {
+    "ko": "refactor: prompt 모듈을 역할별로 분리",
+    "en": "refactor: split prompt modules by responsibility"
+  },
   "journal": {
     "context": "프롬프트 관련 코드가 하나의 파일에 모여 있어, 역할별로 나누는 작업을 진행했다.",
     "decision": "shared, commit, journal 역할별로 파일을 나누기로 했다.",
     "outcome": "Prompt를 shared, commit, journal 세 파일로 나누어 각 역할별 수정 위치를 분리했다.",
-    "next": "이번 작업은 Prompt 구조 분리로 마무리했다."
+    "next": "기록되지 않음"
   },
   "troubleshooting": null
 }
@@ -93,7 +88,10 @@ Mock 응답을 실제 API로 교체해 End-to-end 흐름 검증
 **출력:**
 \`\`\`json
 {
-  "commitMessage": "feat: OpenAI API 연동 및 Prompt 모듈 분리",
+  "commit": {
+    "ko": "feat: OpenAI API 연동 및 prompt 모듈 분리",
+    "en": "feat: integrate OpenAI API and split prompt modules"
+  },
   "journal": {
     "context": "Mock 응답만으로는 실제 흐름을 검증하기 어려워, 이번 작업에서 실제 API를 붙이는 것을 목표로 잡았다.",
     "decision": "호출은 Route Handler에서 서버 사이드로 처리하고, Prompt는 lib/prompt.ts로 분리하기로 했다.",
