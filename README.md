@@ -75,21 +75,23 @@ Troubleshooting은 문제가 발생했을 때만 작성합니다.
 - Day 7 · [2026-08-02](journal/2026-08-02.md)
 - Day 8 · [2026-08-03](journal/2026-08-03.md)
 - Day 9 · [2026-08-04](journal/2026-08-04.md)
+- Day 10 · [2026-08-05](journal/2026-08-05.md)
 
 ---
 
 ## 🛠 Projects
 
-### ✅ Project01
 
-AI Dev Assistant
+### 🚀 AI Dev Assistant
 
-오늘 작업한 내용을 기반으로
+오늘 작업한 내용을 입력하면
 
 - Commit Message
 - Development Journal
 
-을 생성하는 AI 도구
+을 생성해 주는 AI 개발 기록 도구입니다.
+
+➡️ **[프로젝트 자세히 보기](projects/01-ai-commit-writer/)**
 
 ---
 

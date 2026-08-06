@@ -438,6 +438,24 @@ export default function Home() {
   const showWizard = !result;
   const primaryDisabled = isAnalyzing || isLoading || !canProceed;
 
+  const handlePrimaryActionRef = useRef(handlePrimaryAction);
+  handlePrimaryActionRef.current = handlePrimaryAction;
+  const primaryDisabledRef = useRef(primaryDisabled);
+  primaryDisabledRef.current = primaryDisabled;
+
+  useEffect(() => {
+    function onGlobalKeyDown(e: KeyboardEvent) {
+      if (e.key !== "Enter" || !(e.metaKey || e.ctrlKey)) return;
+      if (!showWizard || primaryDisabledRef.current) return;
+
+      e.preventDefault();
+      handlePrimaryActionRef.current();
+    }
+
+    window.addEventListener("keydown", onGlobalKeyDown);
+    return () => window.removeEventListener("keydown", onGlobalKeyDown);
+  }, [showWizard]);
+
   const primaryLabel = isAnalyzing
     ? "AI가 분석 중..."
     : isLoading
@@ -540,17 +558,6 @@ export default function Home() {
                     id="work-input"
                     value={work}
                     onChange={(e) => setWork(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (
-                        e.key === "Enter" &&
-                        (e.metaKey || e.ctrlKey) &&
-                        !primaryDisabled &&
-                        !isLastStep
-                      ) {
-                        e.preventDefault();
-                        handlePrimaryAction();
-                      }
-                    }}
                     placeholder={
                       "OpenAI API 연동\nSkeleton UI 추가\nlocalStorage 자동 저장"
                     }
@@ -603,17 +610,6 @@ export default function Home() {
                       ref={troubleshootingInputRef}
                       value={troubleshootingText}
                       onChange={(e) => setTroubleshootingText(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (
-                          e.key === "Enter" &&
-                          (e.metaKey || e.ctrlKey) &&
-                          isLastStep &&
-                          !primaryDisabled
-                        ) {
-                          e.preventDefault();
-                          void handleGenerate();
-                        }
-                      }}
                       placeholder={
                         troubleshootingChoice === "error"
                           ? "에러 메시지나 상황을 입력해주세요"
