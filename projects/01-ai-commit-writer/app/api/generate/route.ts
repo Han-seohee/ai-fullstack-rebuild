@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import OpenAI from "openai";
 
 import type { GenerateResult } from "@/lib/generate";
+import { createJsonObjectCompletion } from "@/lib/openai-json";
 import { SYSTEM_PROMPT, buildUserInput } from "@/lib/prompt";
 
 type GenerateRequestBody = {
@@ -38,19 +39,11 @@ export async function POST(request: Request) {
 
     const openai = new OpenAI({ apiKey });
 
-    const response = await openai.responses.create({
-      model: "gpt-4o-mini",
-      instructions: SYSTEM_PROMPT,
-      input: buildUserInput(input),
-      text: {
-        format: { type: "json_object" },
-      },
-    });
-
-    const content = response.output_text;
-    if (!content) {
-      throw new Error("OpenAI 응답이 비어 있습니다.");
-    }
+    const content = await createJsonObjectCompletion(
+      openai,
+      SYSTEM_PROMPT,
+      buildUserInput(input),
+    );
 
     const result = JSON.parse(content) as GenerateResult;
 

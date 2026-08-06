@@ -17,3 +17,18 @@ export type GenerateResult = {
   journal: JournalEntry;
   troubleshooting: TroubleshootingEntry | null;
 };
+
+export type DetailResult = {
+  journal: JournalEntry;
+};
+
+export function isValidJournalEntry(value: unknown): value is JournalEntry {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    typeof (value as JournalEntry).context === "string" &&
+    typeof (value as JournalEntry).decision === "string" &&
+    typeof (value as JournalEntry).outcome === "string" &&
+    typeof (value as JournalEntry).next === "string"
+  );
+}
