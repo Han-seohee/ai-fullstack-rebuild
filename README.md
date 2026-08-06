@@ -78,6 +78,7 @@ Troubleshooting은 매일 쓰는 항목이 아니다. 개발 중 막혔다가 �
 - Day 3 · [2026-07-29](journal/2026-07-29.md)
 - Day 4 · [2026-07-30](journal/2026-07-30.md)
 - Day 5 · [2026-07-31](journal/2026-07-31.md)
+- Day 6 · [2026-08-01](journal/2026-08-01.md)
 
 
 ## 🛠 Projects

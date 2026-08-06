@@ -54,13 +54,23 @@ export async function POST(request: Request) {
 
     const result = JSON.parse(content) as GenerateResult;
 
+    const troubleshooting = result.troubleshooting;
+    const isValidTroubleshooting =
+      troubleshooting === null ||
+      (typeof troubleshooting === "object" &&
+        typeof troubleshooting.problem === "string" &&
+        typeof troubleshooting.cause === "string" &&
+        typeof troubleshooting.solution === "string" &&
+        typeof troubleshooting.learned === "string");
+
     if (
       typeof result.commitMessage !== "string" ||
       !result.journal ||
       typeof result.journal.context !== "string" ||
       typeof result.journal.decision !== "string" ||
       typeof result.journal.outcome !== "string" ||
-      typeof result.journal.next !== "string"
+      typeof result.journal.next !== "string" ||
+      !isValidTroubleshooting
     ) {
       throw new Error("OpenAI 응답 형식이 올바르지 않습니다.");
     }
