@@ -18,6 +18,23 @@ export type GenerateResult = {
   troubleshooting: TroubleshootingEntry | null;
 };
 
+/** 커밋 메시지 출력 언어 (추후 CommitStyle 등과 조합 가능) */
+export const COMMIT_LANGUAGES = ["ko", "en"] as const;
+export type CommitLanguage = (typeof COMMIT_LANGUAGES)[number];
+export const DEFAULT_COMMIT_LANGUAGE: CommitLanguage = "en";
+
+export const COMMIT_LANGUAGE_LABELS: Record<CommitLanguage, string> = {
+  ko: "🇰🇷 한국어",
+  en: "🇺🇸 English",
+};
+
+export function isCommitLanguage(value: unknown): value is CommitLanguage {
+  return (
+    typeof value === "string" &&
+    (COMMIT_LANGUAGES as readonly string[]).includes(value)
+  );
+}
+
 /** AI follow-up 질문 카테고리 */
 export type QuestionCategory = "reason" | "troubleshooting" | "next";
 

@@ -29,12 +29,21 @@ Prompt 변경 이력을 기록합니다. Prompt를 수정할 때마다 새 버�
 
 ---
 
-## v5 (current)
+## v5
 
 - Detail Prompt 분리 (`lib/prompts/detail.ts`)
 - 기억 정리 방향 전환 (추측·창작 금지 강화)
 - Few-shot 예시 추가 (에러 붙여넣기, 미해결, 짧은 입력)
 - Prompt Versioning 구조 (`lib/prompts/`)
+
+---
+
+## v6 (current)
+
+- 창작 금지 vs 정리 허용 기준 명확화 (복붙 방지 + 자연스러운 재구성 허용)
+- context / decision / outcome 필드별 역할·작성 가이드 강화
+- decision: 입력에 명시된 선택·이유만 / outcome: 완료 작업만 (효과·성과 금지)
+- Few-shot 예시 전면 개편 (Prompt 분리 정리 예시 추가, journal 필드 관점 분리)
 
 ---
 

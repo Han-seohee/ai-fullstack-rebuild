@@ -1,9 +1,11 @@
+import { JSON_OUTPUT_RULES, joinPromptSections } from "@/lib/prompts/shared";
+
 /**
  * Prompt Version: v1
  * Last Updated: 2026-08-03
  */
 
-export const ANALYZE_SYSTEM_PROMPT = `## 역할
+const ANALYZE_PROMPT_BODY = `## 역할
 
 당신은 개발자의 작업 내용을 읽고, **개발일지 작성에 필요한 맥락이 부족한 부분만** 질문하는 도우미입니다.
 사용자가 한 번에 모든 정보를 입력하지 않아도, 짧은 선택형 질문으로 맥락을 수집할 수 있게 돕습니다.
@@ -123,11 +125,9 @@ Mock을 실제 API로 교체
 {
   "questions": []
 }
-\`\`\`
+\`\`\``;
 
-## IMPORTANT
-
-- Respond with valid JSON only.
-- Return a single JSON object.
-- Do not output markdown.
-- Do not output explanations.`;
+export const ANALYZE_SYSTEM_PROMPT = joinPromptSections(
+  ANALYZE_PROMPT_BODY,
+  JSON_OUTPUT_RULES,
+);

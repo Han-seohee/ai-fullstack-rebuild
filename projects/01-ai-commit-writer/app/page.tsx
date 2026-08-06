@@ -16,10 +16,16 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
 import type {
+  CommitLanguage,
   FollowUpQuestion,
   GenerateResult,
   JournalEntry,
   TroubleshootingEntry,
+} from "@/lib/generate";
+import {
+  COMMIT_LANGUAGES,
+  COMMIT_LANGUAGE_LABELS,
+  DEFAULT_COMMIT_LANGUAGE,
 } from "@/lib/generate";
 import { buildCombinedInput } from "@/lib/input";
 import {
@@ -118,6 +124,9 @@ export default function Home() {
   const [stepDirection, setStepDirection] = useState<StepDirection>("forward");
   const [analyzed, setAnalyzed] = useState(false);
   const [workAtAnalysis, setWorkAtAnalysis] = useState("");
+  const [commitLanguage, setCommitLanguage] = useState<CommitLanguage>(
+    DEFAULT_COMMIT_LANGUAGE,
+  );
 
   const [result, setResult] = useState<GenerateResult | null>(null);
 
@@ -176,6 +185,7 @@ export default function Home() {
       setTroubleshootingText(draft.troubleshootingText);
       setCurrentStep(draft.currentStep);
       setAnalyzed(draft.analyzed);
+      setCommitLanguage(draft.commitLanguage ?? DEFAULT_COMMIT_LANGUAGE);
       if (draft.analyzed) setWorkAtAnalysis(draft.work.trim());
     }
     setHistory(loadHistory());
@@ -194,6 +204,7 @@ export default function Home() {
       troubleshootingText,
       currentStep,
       analyzed,
+      commitLanguage,
     });
   }, [
     work,
@@ -204,6 +215,7 @@ export default function Home() {
     troubleshootingText,
     currentStep,
     analyzed,
+    commitLanguage,
     isDraftLoaded,
   ]);
 
@@ -313,7 +325,7 @@ export default function Home() {
       const response = await fetch("/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ input: combinedInput }),
+        body: JSON.stringify({ input: combinedInput, commitLanguage }),
       });
 
       if (!response.ok) {
@@ -346,6 +358,7 @@ export default function Home() {
     setCurrentStep(0);
     setAnalyzed(false);
     setWorkAtAnalysis("");
+    setCommitLanguage(DEFAULT_COMMIT_LANGUAGE);
     setResult(null);
     setError(null);
     clearDraft();
@@ -738,6 +751,33 @@ export default function Home() {
         </CardHeader>
         <CardContent className="space-y-8 pt-6">
           <section className="space-y-3">
+            <div
+              className="inline-flex rounded-lg border border-border/60 bg-muted/30 p-1"
+              role="group"
+              aria-label="커밋 메시지 언어"
+            >
+              {COMMIT_LANGUAGES.map((lang) => {
+                const isSelected = commitLanguage === lang;
+                return (
+                  <button
+                    key={lang}
+                    type="button"
+                    disabled={isLoading}
+                    onClick={() => setCommitLanguage(lang)}
+                    aria-pressed={isSelected}
+                    className={cn(
+                      "rounded-md px-3 py-1.5 text-xs font-medium transition-colors duration-200",
+                      isSelected
+                        ? "bg-background text-foreground shadow-sm"
+                        : "text-muted-foreground hover:text-foreground",
+                      isLoading && "cursor-not-allowed opacity-60",
+                    )}
+                  >
+                    {COMMIT_LANGUAGE_LABELS[lang]}
+                  </button>
+                );
+              })}
+            </div>
             <div className="flex items-start justify-between gap-4">
               <div className="space-y-1">
                 <h3 className="text-sm font-medium text-foreground">

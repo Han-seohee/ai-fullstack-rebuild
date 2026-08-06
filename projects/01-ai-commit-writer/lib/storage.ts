@@ -1,4 +1,9 @@
-import type { FollowUpQuestion, GenerateResult } from "@/lib/generate";
+import type {
+  CommitLanguage,
+  FollowUpQuestion,
+  GenerateResult,
+} from "@/lib/generate";
+import { DEFAULT_COMMIT_LANGUAGE } from "@/lib/generate";
 import { normalizeGenerateResult } from "@/lib/generate";
 
 const DRAFT_KEY = "ai-dev-assistant-draft";
@@ -17,6 +22,7 @@ export type DraftState = {
   /** 0=작업 입력, 1..N=AI 질문, 마지막=트러블슈팅 */
   currentStep: number;
   analyzed: boolean;
+  commitLanguage: CommitLanguage;
 };
 
 export type HistoryEntry = {
@@ -79,6 +85,7 @@ export function loadDraft(): DraftState | null {
       troubleshootingText: draft.troubleshootingText ?? "",
       currentStep: draft.currentStep,
       analyzed: draft.analyzed,
+      commitLanguage: draft.commitLanguage ?? DEFAULT_COMMIT_LANGUAGE,
     };
   } catch {
     return null;

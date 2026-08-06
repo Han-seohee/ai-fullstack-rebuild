@@ -1,12 +1,20 @@
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
 
-import { type GenerateResult, isValidJournalEntry } from "@/lib/generate";
+import {
+  DEFAULT_COMMIT_LANGUAGE,
+  type CommitLanguage,
+  type GenerateResult,
+  isCommitLanguage,
+  isValidJournalEntry,
+} from "@/lib/generate";
 import { createJsonObjectCompletion } from "@/lib/openai-json";
-import { SYSTEM_PROMPT, buildUserInput } from "@/lib/prompt";
+import { buildGenerateSystemPrompt } from "@/lib/prompts/index";
+import { buildUserInput } from "@/lib/prompt";
 
 type GenerateRequestBody = {
   input?: string;
+  commitLanguage?: CommitLanguage;
 };
 
 /**
@@ -28,6 +36,9 @@ export async function POST(request: Request) {
   try {
     const body = (await request.json()) as GenerateRequestBody;
     const input = (body.input ?? "").trim();
+    const commitLanguage = isCommitLanguage(body.commitLanguage)
+      ? body.commitLanguage
+      : DEFAULT_COMMIT_LANGUAGE;
 
     if (!input) {
       return NextResponse.json(
@@ -40,8 +51,8 @@ export async function POST(request: Request) {
 
     const content = await createJsonObjectCompletion(
       openai,
-      SYSTEM_PROMPT,
-      buildUserInput(input),
+      buildGenerateSystemPrompt({ commitLanguage }),
+      buildUserInput(input, commitLanguage),
     );
 
     const result = JSON.parse(content) as GenerateResult;
