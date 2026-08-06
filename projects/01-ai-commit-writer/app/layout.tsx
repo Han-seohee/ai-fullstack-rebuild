@@ -1,7 +1,9 @@
-import type { Metadata } from "next";
+import type { Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { ViewportPaddingFix } from "@/components/viewport-padding-fix";
+import { createSiteMetadata } from "@/lib/metadata";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -14,10 +16,11 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "AI Dev Assistant",
-  description:
-    "오늘 작업한 내용을 입력하면 AI가 커밋 메시지와 개발일지를 생성합니다.",
+export const metadata = createSiteMetadata();
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
 };
 
 export default function RootLayout({
@@ -28,9 +31,10 @@ export default function RootLayout({
   return (
     <html
       lang="ko"
-      className={`${geistSans.variable} ${geistMono.variable} dark h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} dark antialiased`}
     >
-      <body className="flex min-h-full flex-col bg-background">
+      <body className="bg-background pb-[var(--viewport-bottom-inset,0px)]">
+        <ViewportPaddingFix />
         <TooltipProvider>{children}</TooltipProvider>
         <Toaster position="bottom-right" richColors closeButton />
       </body>

@@ -1,7 +1,7 @@
 "use client";
 
 import { ChevronLeft, Clock } from "lucide-react";
-import { useEffect, useRef, useState, type MutableRefObject } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type MutableRefObject } from "react";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
@@ -147,8 +147,10 @@ export default function Home() {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const customInputRef = useRef<HTMLTextAreaElement>(null);
   const troubleshootingInputRef = useRef<HTMLTextAreaElement>(null);
+  const resultsCardRef = useRef<HTMLDivElement>(null);
   const commitCopyTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const journalCopyTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const skipNextSave = useRef(true);
 
   // 0=작업, 1..N=AI질문, N+1=트러블슈팅(항상 마지막)
   const totalSteps = 1 + questions.length + 1;
@@ -162,8 +164,9 @@ export default function Home() {
   const isLastStep = isTroubleshootingStep;
 
   useEffect(() => {
+    if (!isDraftLoaded) return;
     textareaRef.current?.focus();
-  }, [currentStep]);
+  }, [currentStep, isDraftLoaded]);
 
   // 작업 내용 변경 시 분석 결과 초기화
   useEffect(() => {
@@ -179,20 +182,11 @@ export default function Home() {
     }
   }, [work, workAtAnalysis, analyzed, isDraftLoaded]);
 
-  // 새로고침 후 마지막 입력 복원
-  useEffect(() => {
+  // SSR과 동일한 초기 state 유지 → mount 후 paint 전에 localStorage 복원
+  useLayoutEffect(() => {
     const draft = loadDraft();
     if (draft) {
       setWork(draft.work);
-      setQuestions(draft.questions);
-      setCheckedOptions(draft.checkedOptions);
-      setCustomAnswers(draft.customAnswers);
-      setTroubleshootingChoice(draft.troubleshootingChoice);
-      setTroubleshootingText(draft.troubleshootingText);
-      setCurrentStep(draft.currentStep);
-      setAnalyzed(draft.analyzed);
-      setCommitLanguage(draft.commitLanguage ?? DEFAULT_COMMIT_LANGUAGE);
-      if (draft.analyzed) setWorkAtAnalysis(draft.work.trim());
     }
     setHistory(loadHistory());
     setIsDraftLoaded(true);
@@ -201,6 +195,10 @@ export default function Home() {
   // 입력 변경 시 localStorage에 자동 저장
   useEffect(() => {
     if (!isDraftLoaded) return;
+    if (skipNextSave.current) {
+      skipNextSave.current = false;
+      return;
+    }
     saveDraft({
       work,
       questions,
@@ -401,6 +399,13 @@ export default function Home() {
   function handleHistorySelect(entry: HistoryEntry) {
     setResult(entry.result);
     setError(null);
+
+    requestAnimationFrame(() => {
+      resultsCardRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    });
   }
 
   function handlePrimaryAction() {
@@ -477,7 +482,7 @@ export default function Home() {
         : "해당하는 항목을 모두 선택할 수 있습니다.";
 
   return (
-    <div className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-8 px-4 py-10 sm:px-6 sm:py-14">
+    <main className="mx-auto flex w-full max-w-3xl flex-col gap-8 px-4 py-10 sm:px-6 sm:py-14">
       <header className="space-y-3">
         <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
           01 · AI Dev Assistant
@@ -747,6 +752,7 @@ export default function Home() {
         </Card>
       )}
 
+      <div ref={resultsCardRef} className="scroll-mt-4">
       <Card
         className={cn(
           "transition-all duration-300",
@@ -920,6 +926,7 @@ export default function Home() {
           )}
         </CardContent>
       </Card>
+      </div>
 
       {history.length > 0 && (
         <Card className="transition-shadow duration-200 hover:shadow-sm">
@@ -951,6 +958,6 @@ export default function Home() {
           </CardContent>
         </Card>
       )}
-    </div>
+    </main>
   );
 }
