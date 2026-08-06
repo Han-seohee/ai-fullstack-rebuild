@@ -5,7 +5,7 @@ const JSON_OBJECT_TEXT_FORMAT = {
 };
 
 /**
- * Responses API json_object 모드 호출을 generate·detail API에서 동일하게 사용합니다.
+ * Responses API json_object 모드 호출을 API route에서 공통 사용합니다.
  * input 메시지에 'json' 키워드가 포함되어야 하므로 buildUserInput / buildDetailUserInput에서 보장합니다.
  */
 export async function createJsonObjectCompletion(

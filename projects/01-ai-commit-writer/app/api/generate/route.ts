@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import OpenAI from "openai";
 
-import type { GenerateResult } from "@/lib/generate";
+import { type GenerateResult, isValidJournalEntry } from "@/lib/generate";
 import { createJsonObjectCompletion } from "@/lib/openai-json";
 import { SYSTEM_PROMPT, buildUserInput } from "@/lib/prompt";
 
@@ -29,7 +29,6 @@ export async function POST(request: Request) {
     const body = (await request.json()) as GenerateRequestBody;
     const input = (body.input ?? "").trim();
 
-    // 클라이언트 검증을 우회한 빈 요청을 서버에서도 거절합니다.
     if (!input) {
       return NextResponse.json(
         { error: "입력 내용을 작성해주세요." },
@@ -58,11 +57,7 @@ export async function POST(request: Request) {
 
     if (
       typeof result.commitMessage !== "string" ||
-      !result.journal ||
-      typeof result.journal.context !== "string" ||
-      typeof result.journal.decision !== "string" ||
-      typeof result.journal.outcome !== "string" ||
-      typeof result.journal.next !== "string" ||
+      !isValidJournalEntry(result.journal) ||
       !isValidTroubleshooting
     ) {
       throw new Error("OpenAI 응답 형식이 올바르지 않습니다.");
