@@ -94,6 +94,10 @@ Troubleshooting은 문제가 발생했을 때만 작성합니다.
 
 ➡️ **[프로젝트 자세히 보기](projects/01-ai-commit-writer/)**
 
+## 🌐 Live Demo
+
+https://ai-dev-assistant-v1.vercel.app
+
 ---
 
 ## 🧭 Principles
