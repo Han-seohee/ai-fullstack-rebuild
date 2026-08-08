@@ -1,9 +1,5 @@
 ← [Back to Repository](../../README.md)
 
-## 🌐 Live Demo
-
-https://ai-dev-assistant-v1.vercel.app
-
 # AI Dev Assistant
 
 AI를 활용해 오늘 작업한 내용을 기반으로
@@ -12,6 +8,10 @@ AI를 활용해 오늘 작업한 내용을 기반으로
 - Development Journal
 
 을 생성하는 개발자 생산성 도구입니다.
+
+## 🌐 Live Demo
+
+https://ai-dev-assistant-v1.vercel.app
 
 ---
 

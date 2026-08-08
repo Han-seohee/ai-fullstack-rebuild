@@ -39,7 +39,7 @@ AI 시대에 풀스택 개발자로 다시 성장하는 과정을 기록하는 �
 - [x] AI Dev Assistant MVP
 - [x] OpenAI Integration
 - [x] Prompt Architecture
-- [ ] Project01 Release
+- [x] Project01 Release
 - [ ] Project02
 - [ ] Project03
 - [ ] Portfolio Website
@@ -52,7 +52,7 @@ AI 시대에 풀스택 개발자로 다시 성장하는 과정을 기록하는 �
 | Folder | Description |
 | ------- | ----------- |
 | journal | 날짜별 개발 기록 |
-| projects | 실험성 프로젝트 및 작은 프로젝트 |
+| projects | 학습 과정에서 만든 프로젝트 |
 
 ---
 
@@ -77,6 +77,7 @@ Troubleshooting은 문제가 발생했을 때만 작성합니다.
 - Day 9 · [2026-08-04](journal/2026-08-04.md)
 - Day 10 · [2026-08-05](journal/2026-08-05.md)
 - Day 11 · [2026-08-06](journal/2026-08-06.md)
+- Day 12 · [2026-08-08](journal/2026-08-08.md)
 
 ---
 
@@ -94,9 +95,7 @@ Troubleshooting은 문제가 발생했을 때만 작성합니다.
 
 ➡️ **[프로젝트 자세히 보기](projects/01-ai-commit-writer/)**
 
-## 🌐 Live Demo
-
-https://ai-dev-assistant-v1.vercel.app
+🌐 **[Live Demo](https://ai-dev-assistant-v1.vercel.app)**
 
 ---
 
